@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".MainActivity">
+
+    <!-- FAST 로고 이미지 -->
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_width="187dp"
+        android:layout_height="86dp"
+        android:src="@drawable/LOGO"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp"
+        android:contentDescription="FAST Logo" />
+
+    <!-- 날짜 텍스트 -->
+    <TextView
+        android:id="@+id/date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2024년 10월 01일"
+        android:textColor="#6A6A6A"
+        android:textSize="16sp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/logo_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="100dp"/>
+
+    <!-- ANA 버튼 이미지 -->
+    <ImageView
+        android:id="@+id/ANA_button_image"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:src="@drawable/ANABUTTON"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/logo_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="140dp"
+        android:contentDescription="ANA Button Image" />
+
+    <!-- 하단 설명 텍스트 -->
+    <TextView
+        android:id="@+id/info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="진단은 약 1분 정도 소요되며, \nF(얼굴 사진 촬영), A(팔 뻗기), S(말하기)가 \n순차적으로 자동 실행됩니다.\n안내에 잘 따라주시기 바랍니다. :)"
+        android:textSize="14sp"
+        android:textStlye="bold"
+        android:textColor="#004D40"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/ANA_button_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="30dp"/>
+
+    <!-- 하단바 -->
+    <View
+        android:id="@+id/bottom_bar"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="#E0E0E0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- T 버튼 이미지 -->
+    <ImageView
+        android:id="@+id/T_button_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/BUTTON"
+        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="-50dp"
+        android:contentDescription="T Button Image" />
+</androidx.constraintlayout.widget.ConstraintLayout>

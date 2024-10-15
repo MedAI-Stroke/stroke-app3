@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".MainActivity">
+
+    <!-- FAST 로고 이미지 -->
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_width="187dp"
+        android:layout_height="86dp"
+        android:src="@drawable/LOGO"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp"
+        android:contentDescription="FAST Logo" />
+
+
+    <!-- 상태바 -->
+    <ImageView
+        android:id="@+id/PROA_image"
+        android:layout_width="420dp"
+        android:layout_height="80dp"
+        android:src="@drawable/PROA"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/logo_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="-20dp"
+        android:contentDescriptionF"PRO A Image" />
+
+    <ImageView
+        android:id="@+id/ARIGHT_image"
+        android:layout_width="700dp"
+        android:layout_height="500dp"
+        android:contentDescription="ARIGHT Image"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ARIGHT"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/logo_image" />
+
+    <ImageView
+        android:id="@+id/CIRCLE_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:contentDescription="CIRCLE Image"
+        android:scaleType="fitCenter"
+        android:src="@drawable/CIRCLE"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="150dp"
+        app:layout_constraintTop_toBottomOf="@id/logo_image" />
+
+    <TextView
+        android:id="@+id/COUNT_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10"
+        android:textColor="#4F9E9E"
+        android:textSize="40sp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/logo_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="220dp"/>
+    <!-- 하단바 -->
+    <View
+        android:id="@+id/bottom_bar"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="#E0E0E0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- T 버튼 이미지 -->
+    <ImageView
+        android:id="@+id/T_button_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/BUTTON"
+        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="-50dp"
+        android:contentDescription="T Button Image" />
+</androidx.constraintlayout.widget.ConstraintLayout>

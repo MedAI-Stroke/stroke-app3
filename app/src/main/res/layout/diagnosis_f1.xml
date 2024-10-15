@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".MainActivity">
+
+    <!-- FAST 로고 이미지 -->
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_width="187dp"
+        android:layout_height="86dp"
+        android:src="@drawable/LOGO"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp"
+        android:contentDescription="FAST Logo" />
+
+
+    <!-- 상태바 -->
+    <ImageView
+        android:id="@+id/PROF_image"
+        android:layout_width="420dp"
+        android:layout_height="80dp"
+        android:src="@drawable/PROF"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/logo_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="-20dp"
+        android:contentDescription="PRO F Image" />
+
+    <ImageView
+        android:id="@+id/F1_image"
+        android:layout_width="320dp"
+        android:layout_height="200dp"
+        android:contentDescription="F1 Image"
+        android:scaleType="fitCenter"
+        android:src="@drawable/F1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/logo_image" />
+
+    <ImageView
+        android:id="@+id/F2_image"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:contentDescription="F2 Image"
+        android:scaleType="fitCenter"
+        android:src="@drawable/F2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="230dp"
+        app:layout_constraintTop_toBottomOf="@id/logo_image" />
+
+    <!-- 하단바 -->
+    <View
+        android:id="@+id/bottom_bar"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="#E0E0E0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- T 버튼 이미지 -->
+    <ImageView
+        android:id="@+id/T_button_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/BUTTON"
+        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="-50dp"
+        android:contentDescription="T Button Image" />
+</androidx.constraintlayout.widget.ConstraintLayout>
