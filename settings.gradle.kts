@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FAST2"
+rootProject.name = "stroke-app"
 include(":app")
- 
