@@ -13,7 +13,7 @@
         android:id="@+id/logo_image"
         android:layout_width="187dp"
         android:layout_height="86dp"
-        android:src="@drawable/LOGO"
+        android:src="@drawable/logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,13 +26,13 @@
         android:id="@+id/PROF_image"
         android:layout_width="420dp"
         android:layout_height="80dp"
-        android:src="@drawable/PROF"
+        android:src="@drawable/prof"
         android:scaleType="fitCenter"
         app:layout_constraintTop_toBottomOf="@id/logo_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="-20dp"
-        android:contentDescriptionF"PRO F Image" />
+        android:contentDescription="PRO F Image" />
 
     <ImageView
         android:id="@+id/F3_image"
@@ -40,7 +40,7 @@
         android:layout_height="500dp"
         android:contentDescription="F3 Image"
         android:scaleType="fitCenter"
-        android:src="@drawable/F3"
+        android:src="@drawable/f3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="40dp"
@@ -52,11 +52,24 @@
         android:layout_height="380dp"
         android:contentDescription="F4 Image"
         android:scaleType="fitCenter"
-        android:src="@drawable/F4"
+        android:src="@drawable/f4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="60dp"
         app:layout_constraintTop_toBottomOf="@id/logo_image" />
+
+    <SurfaceView
+        android:id="@+id/camera_preview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintTop_toBottomOf="@id/PROF_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
 
     <!-- 하단바 -->
     <View
@@ -73,7 +86,7 @@
         android:id="@+id/T_button_image"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/BUTTON"
+        android:src="@drawable/button"
         app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

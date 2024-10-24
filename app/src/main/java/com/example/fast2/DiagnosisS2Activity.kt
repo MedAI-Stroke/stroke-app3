@@ -1,39 +1,61 @@
 package com.example.fast2
 
 import android.content.Intent
+import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
-import android.speech.RecognizerIntent
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import java.util.Locale
+import java.io.File
 
 class DiagnosisS2Activity : AppCompatActivity() {
-    private val SPEECH_REQUEST_CODE = 101
+    private var mediaRecorder: MediaRecorder? = null
+    private lateinit var outputFile: File
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.diagnosis_s2)
 
-        // 3초 후 음성 인식 시작
-        Handler().postDelayed({
-            captureSpeech()
-        }, 3000)
+        setupRecorder()
+
+        // 5초 동안 녹음 후 다음 화면으로 이동
+        Handler(Looper.getMainLooper()).postDelayed({
+            stopRecording()
+            startActivity(Intent(this, AnalysisMainActivity::class.java))
+        }, 5000)
     }
 
-    private fun captureSpeech() {
-        val speechIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-        startActivityForResult(speechIntent, SPEECH_REQUEST_CODE)
-    }
+    private fun setupRecorder() {
+        outputFile = File(cacheDir, "audio_record.mp3")
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
-            // 5초 후 AnalysisMainActivity로 전환
-            Handler().postDelayed({
-                startActivity(Intent(this, AnalysisMainActivity::class.java))
-            }, 5000)
+        mediaRecorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setOutputFile(outputFile.absolutePath)
+            try {
+                prepare()
+                start()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+    }
+
+    private fun stopRecording() {
+        mediaRecorder?.apply {
+            try {
+                stop()
+                release()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        mediaRecorder = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopRecording()
     }
 }

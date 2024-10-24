@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 
 class DiagnosisA1Activity : AppCompatActivity(), SensorEventListener {
@@ -28,7 +29,7 @@ class DiagnosisA1Activity : AppCompatActivity(), SensorEventListener {
         startMeasuring()
 
         // 10초 후에 DiagnosisA2Activity로 전환
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             stopMeasuring()
             startActivity(Intent(this, DiagnosisA2Activity::class.java))
         }, 10000)

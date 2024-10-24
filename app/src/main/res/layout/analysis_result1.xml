@@ -13,7 +13,7 @@
         android:id="@+id/logo_image"
         android:layout_width="187dp"
         android:layout_height="86dp"
-        android:src="@drawable/LOGO"
+        android:src="@drawable/logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,7 +26,7 @@
         android:layout_height="500dp"
         android:contentDescription="R1 Image"
         android:scaleType="fitCenter"
-        android:src="@drawable/R1"
+        android:src="@drawable/r1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
@@ -34,7 +34,7 @@
 
     <!-- 날짜 텍스트 -->
     <TextView
-        android:id="@+id/date_text"
+        android:id="@+id/date_text_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2024년 10월 01일"
@@ -48,13 +48,13 @@
         android:layout_marginTop="80dp"/>
 
     <TextView
-        android:id="@+id/date_text"
+        android:id="@+id/date_text_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="'ㅇㅇㅇ님' 진단 결과"
         android:textColor="#4F9E9E"
         android:textSize="23sp"
-        android:textStyle="Bold"
+        android:textStyle="bold"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/logo_image"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,7 +79,7 @@
         android:id="@+id/T_button_image"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/BUTTON"
+        android:src="@drawable/button"
         app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
