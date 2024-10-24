@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.fast2"
-    compileSdkVersion(34)
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.fast2"
-        minSdkVersion(21)
-        targetSdkVersion(34)
+        minSdk = 21
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
