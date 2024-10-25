@@ -20,22 +20,6 @@
         android:layout_marginTop="30dp"
         android:contentDescription="FAST Logo" />
 
-    <!-- 날짜 텍스트 -->
-    <TextView
-        android:id="@+id/date_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="2024년 10월 01일"
-        android:textColor="#6A6A6A"
-        android:textSize="16sp"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/logo_image"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="100dp"/>
-
-
     <ImageView
         android:id="@+id/ANA_button_image"
         android:layout_width="300dp"

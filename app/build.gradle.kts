@@ -70,6 +70,22 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
+    // Retrofit2 - API 통신을 위한 라이브러리
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // OkHttp - 네트워크 통신 로깅 및 인터셉터
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // Coroutines - 비동기 처리를 위한 라이브러리 (이미 있을 수 있음)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Gson - JSON 파싱을 위한 라이브러리
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // 이미지 압축을 위한 라이브러리 (선택사항)
+    implementation("id.zelory:compressor:3.0.1")
+
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
@@ -85,4 +101,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+
 }

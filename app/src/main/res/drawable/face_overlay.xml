@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- 원형 가이드 -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M100,10 A90,90 0 1,0 100,190 A90,90 0 1,0 100,10"
+        android:fillColor="#00000000"/>
+
+    <!-- 십자선 (실선으로 변경) -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:pathData="M20,100 L180,100 M100,20 L100,180"
+        android:fillColor="#00000000"/>
+</vector>
