@@ -1,12 +1,17 @@
 package com.example.fast2
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.AudioFormat
+import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.fast2.api.ApiClient
 import kotlinx.coroutines.Dispatchers
@@ -15,78 +20,164 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
+import java.io.*
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class DiagnosisS2Activity : AppCompatActivity() {
-    private var mediaRecorder: MediaRecorder? = null
+    private var audioRecord: AudioRecord? = null
+    private var isRecording = false
     private lateinit var outputFile: File
-    private val isTestMode = true  // 테스트 모드 플래그
+    private val isTestMode = false
+
+    companion object {
+        private const val SAMPLE_RATE = 16000
+        private const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO
+        private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
+        private const val BUFFER_SIZE = 2048
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.diagnosis_s2)
 
         if (isTestMode) {
-            // 테스트 모드: 3초 후 더미 데이터 전송
             Handler(Looper.getMainLooper()).postDelayed({
                 sendTestAudioData()
             }, 3000)
         } else {
-            // 실제 모드: 녹음 시작
-            setupRecorder()
-            startRecording()
-
-            // 5초 동안 녹음 후 API 전송
-            Handler(Looper.getMainLooper()).postDelayed({
-                stopRecording()
-                uploadAudioFile()
-            }, 5000)
-        }
-    }
-
-    private fun setupRecorder() {
-        outputFile = File(cacheDir, "audio_record.wav")  // WAV 형식으로 변경
-
-        mediaRecorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setOutputFile(outputFile.absolutePath)
-
-            try {
-                prepare()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(this@DiagnosisS2Activity, "녹음 준비 실패", Toast.LENGTH_SHORT).show()
+            if (checkPermission()) {
+                startWavRecording()
+                // 5초 후 녹음 중지
+                Handler(Looper.getMainLooper()).postDelayed({
+                    stopRecording()
+                    uploadAudioFile()
+                }, 5000)
             }
         }
     }
 
-    private fun startRecording() {
-        try {
-            mediaRecorder?.start()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "녹음 시작 실패", Toast.LENGTH_SHORT).show()
+    private fun checkPermission(): Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                123
+            )
+            return false
         }
+        return true
+    }
+
+    private fun startWavRecording() {
+        outputFile = File(cacheDir, "recording.wav")
+
+        val minBufferSize = AudioRecord.getMinBufferSize(
+            SAMPLE_RATE,
+            CHANNEL_CONFIG,
+            AUDIO_FORMAT
+        )
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        audioRecord = AudioRecord(
+            MediaRecorder.AudioSource.MIC,
+            SAMPLE_RATE,
+            CHANNEL_CONFIG,
+            AUDIO_FORMAT,
+            minBufferSize
+        )
+
+        isRecording = true
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            writeWavFile()
+        }
+    }
+
+    private suspend fun writeWavFile() {
+        val tempDataFile = File(cacheDir, "temp_audio_data.raw")
+        var totalDataSize = 0
+
+        // 먼저 raw 데이터를 임시 파일에 저장
+        FileOutputStream(tempDataFile).use { fos ->
+            val buffer = ByteArray(BUFFER_SIZE)
+            audioRecord?.startRecording()
+
+            while (isRecording) {
+                val readSize = audioRecord?.read(buffer, 0, BUFFER_SIZE) ?: -1
+                if (readSize > 0) {
+                    fos.write(buffer, 0, readSize)
+                    totalDataSize += readSize
+                }
+            }
+        }
+
+        // WAV 파일 생성
+        FileOutputStream(outputFile).use { fos ->
+            // WAV 헤더 작성
+            writeWavHeader(fos, totalDataSize)
+
+            // raw 데이터 복사
+            FileInputStream(tempDataFile).use { fis ->
+                val buffer = ByteArray(BUFFER_SIZE)
+                var read: Int
+                while (fis.read(buffer).also { read = it } != -1) {
+                    fos.write(buffer, 0, read)
+                }
+            }
+        }
+
+        // 임시 파일 삭제
+        tempDataFile.delete()
+    }
+
+    private fun writeWavHeader(outputStream: FileOutputStream, totalDataSize: Int) {
+        val buffer = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN)
+
+        // RIFF 헤더
+        buffer.put("RIFF".toByteArray())
+        buffer.putInt(36 + totalDataSize)
+        buffer.put("WAVE".toByteArray())
+
+        // fmt 청크
+        buffer.put("fmt ".toByteArray())
+        buffer.putInt(16) // 서브청크1크기
+        buffer.putShort(1.toShort()) // PCM = 1
+        buffer.putShort(1.toShort()) // 모노 = 1
+        buffer.putInt(SAMPLE_RATE) // 샘플레이트
+        buffer.putInt(SAMPLE_RATE * 2) // 바이트레이트
+        buffer.putShort(2.toShort()) // 블록얼라인
+        buffer.putShort(16.toShort()) // 비트퍼샘플
+
+        // 데이터 청크
+        buffer.put("data".toByteArray())
+        buffer.putInt(totalDataSize)
+
+        outputStream.write(buffer.array())
     }
 
     private fun stopRecording() {
-        try {
-            mediaRecorder?.apply {
-                stop()
-                release()
-            }
-            mediaRecorder = null
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "녹음 종료 실패", Toast.LENGTH_SHORT).show()
+        isRecording = false
+        audioRecord?.apply {
+            stop()
+            release()
         }
+        audioRecord = null
     }
 
     private fun sendTestAudioData() {
         try {
-            // assets 폴더의 테스트 오디오 파일을 캐시로 복사
             val inputStream = assets.open("test_audio.wav")
             val testFile = File(cacheDir, "test_audio.wav")
 
@@ -105,31 +196,20 @@ class DiagnosisS2Activity : AppCompatActivity() {
     private fun uploadAudioFile(file: File = outputFile) {
         lifecycleScope.launch {
             try {
-                // 파일을 MultipartBody.Part로 변환
                 val requestFile = file.asRequestBody("audio/wav".toMediaTypeOrNull())
                 val audioPart = MultipartBody.Part.createFormData("audio", file.name, requestFile)
 
-                // API 호출
                 val response = withContext(Dispatchers.IO) {
                     ApiClient.strokeApiService.analyzeSpeech(audioPart)
                 }
 
                 if (response.isSuccessful) {
                     response.body()?.let { result ->
-                        // 결과 저장
                         getSharedPreferences("analysis_results", MODE_PRIVATE).edit().apply {
                             putFloat("speech_score", result.result.score)
                             putInt("speech_stroke", result.result.stroke)
                             apply()
                         }
-
-                        // 결과에 따른 Toast 메시지
-                        val message = if (result.result.stroke == 1) {
-                            "이상 징후가 감지되었습니다"
-                        } else {
-                            "정상입니다"
-                        }
-                        Toast.makeText(this@DiagnosisS2Activity, message, Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     throw Exception("API 오류: ${response.errorBody()?.string()}")
@@ -142,7 +222,7 @@ class DiagnosisS2Activity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } finally {
-                file.delete()  // 임시 파일 삭제
+                file.delete()
                 navigateToNextScreen()
             }
         }
@@ -155,8 +235,7 @@ class DiagnosisS2Activity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaRecorder?.release()
-        mediaRecorder = null
+        stopRecording()
         if (::outputFile.isInitialized && outputFile.exists()) {
             outputFile.delete()
         }

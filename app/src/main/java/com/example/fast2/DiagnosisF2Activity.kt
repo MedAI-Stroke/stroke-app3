@@ -34,7 +34,7 @@ class DiagnosisF2Activity : AppCompatActivity(), SurfaceHolder.Callback {
     private var isCameraCaptured = false
     private var pictureFile: File? = null
     private lateinit var loadingProgress: ProgressBar
-    private var isTestMode = true  // 테스트 모드 플래그
+    private var isTestMode = false  // 테스트 모드 플래그
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,10 +85,24 @@ class DiagnosisF2Activity : AppCompatActivity(), SurfaceHolder.Callback {
 
             val parameters = camera?.parameters
             val sizes = parameters?.supportedPreviewSizes
-            val optimalSize = getOptimalPreviewSize(sizes, surfaceView.width, surfaceView.height)
-            parameters?.setPreviewSize(optimalSize?.width ?: 640, optimalSize?.height ?: 480)
-            camera?.parameters = parameters
 
+            // 16:9 비율에 가장 가까운 프리뷰 크기 선택
+            val targetRatio = 16.0 / 9.0
+            val optimalSize = sizes?.let {
+                getOptimalPreviewSize(it, surfaceView.width, surfaceView.height, targetRatio)
+            }
+
+            parameters?.setPreviewSize(optimalSize?.width ?: 1280, optimalSize?.height ?: 720)
+
+            // 사진 크기도 설정
+            val pictureSizes = parameters?.supportedPictureSizes
+            val optimalPictureSize = pictureSizes?.let {
+                getOptimalPreviewSize(it, 1280, 720, targetRatio)
+            }
+            parameters?.setPictureSize(optimalPictureSize?.width ?: 1280,
+                optimalPictureSize?.height ?: 720)
+
+            camera?.parameters = parameters
             camera?.setPreviewDisplay(holder)
             camera?.startPreview()
         } catch (e: Exception) {
@@ -124,15 +138,31 @@ class DiagnosisF2Activity : AppCompatActivity(), SurfaceHolder.Callback {
                 val bitmap = android.graphics.BitmapFactory.decodeByteArray(data, 0, data.size)
                 val matrix = Matrix()
                 matrix.postRotate(270f)
+
+                // 이미지 크기 축소
+                val maxDimension = 1024 // 최대 해상도 지정
+                val scaleFactor = Math.min(
+                    maxDimension.toFloat() / bitmap.width,
+                    maxDimension.toFloat() / bitmap.height
+                )
+
+                val resizedBitmap = Bitmap.createScaledBitmap(
+                    bitmap,
+                    (bitmap.width * scaleFactor).toInt(),
+                    (bitmap.height * scaleFactor).toInt(),
+                    true
+                )
+
                 val rotatedBitmap = Bitmap.createBitmap(
-                    bitmap, 0, 0,
-                    bitmap.width, bitmap.height,
+                    resizedBitmap, 0, 0,
+                    resizedBitmap.width, resizedBitmap.height,
                     matrix, true
                 )
 
                 pictureFile = File(cacheDir, "captured_face.jpg")
                 FileOutputStream(pictureFile).use { fos ->
-                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos)
+                    // JPEG 품질을 80으로 낮춰서 파일 크기 감소
+                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos)
                 }
 
                 capturedImage = rotatedBitmap
@@ -184,14 +214,6 @@ class DiagnosisF2Activity : AppCompatActivity(), SurfaceHolder.Callback {
 
                                 // 다음 화면으로 이동
                                 navigateToNextScreen()
-
-                                // 선택적: 결과에 따른 Toast 메시지 표시
-                                val message = if (result.result.stroke == 1) {
-                                    "이상 징후가 감지되었습니다"
-                                } else {
-                                    "정상입니다"
-                                }
-                                Toast.makeText(this@DiagnosisF2Activity, message, Toast.LENGTH_SHORT).show()
                             }
                         } else {
                             Toast.makeText(
@@ -225,27 +247,43 @@ class DiagnosisF2Activity : AppCompatActivity(), SurfaceHolder.Callback {
         finish()
     }
 
-    private fun getOptimalPreviewSize(sizes: List<Camera.Size>?, targetWidth: Int, targetHeight: Int): Camera.Size? {
+    private fun getOptimalPreviewSize(
+        sizes: List<Camera.Size>,
+        targetWidth: Int,
+        targetHeight: Int,
+        targetRatio: Double
+    ): Camera.Size? {
         val ASPECT_TOLERANCE = 0.1
-        val targetRatio = targetWidth.toDouble() / targetHeight
-
-        if (sizes.isNullOrEmpty()) return null
-
         var optimalSize: Camera.Size? = null
         var minDiff = Double.MAX_VALUE
 
         for (size in sizes) {
             val ratio = size.width.toDouble() / size.height
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue
-            if (Math.abs(size.height - targetHeight) < minDiff) {
+
+            val diff = Math.abs(size.height - targetHeight) +
+                    Math.abs(size.width - targetWidth)
+            if (diff < minDiff) {
                 optimalSize = size
-                minDiff = Math.abs(size.height - targetHeight).toDouble()
+                minDiff = diff.toDouble()
+            }
+        }
+
+        // 비율이 맞는 크기를 찾지 못한 경우, 가장 가까운 크기 반환
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE
+            for (size in sizes) {
+                val diff = Math.abs(size.height - targetHeight) +
+                        Math.abs(size.width - targetWidth)
+                if (diff < minDiff) {
+                    optimalSize = size
+                    minDiff = diff.toDouble()
+                }
             }
         }
 
         return optimalSize ?: sizes[0]
     }
-
     private fun saveAnalysisResult(type: String, response: StrokeAnalysisResponse) {
         getSharedPreferences("analysis_results", MODE_PRIVATE).edit().apply {
             // API 응답에서 받은 score와 stroke 값을 저장

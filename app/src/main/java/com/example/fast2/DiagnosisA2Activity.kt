@@ -33,7 +33,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
     private var isMeasuring = false
 
     // 테스트 모드 관련 변수
-    private val isTestMode = true  // 테스트 모드 활성화
+    private val isTestMode = false  // 테스트 모드 비활성화
     private var testStartTime: Long = 0
 
     // 센서 데이터 관련 변수
@@ -200,14 +200,6 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
                         apply()
                     }
 
-                    withContext(Dispatchers.Main) {
-                        val message = if (result.result.stroke == 1) {
-                            "이상 징후가 감지되었습니다"
-                        } else {
-                            "정상입니다"
-                        }
-                        Toast.makeText(this@DiagnosisA2Activity, message, Toast.LENGTH_SHORT).show()
-                    }
                 }
             } else {
                 android.util.Log.e("DiagnosisA2", "API Error: ${response.errorBody()?.string()}")
