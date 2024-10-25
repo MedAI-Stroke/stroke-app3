@@ -24,13 +24,7 @@ class AnalysisResultActivity : AppCompatActivity() {
         val resultBuilder = StringBuilder().apply {
 
             append("진단 결과\n\n")
-
-            // 이상이 있는 경우 경고 메시지 추가
-            if (faceStroke == 1 || armStroke == 1 || speechStroke == 1) {
-                setContentView(R.layout.analysis_result1)  // 첫 번째 결과 화면 사용
-            } else {
-                setContentView(R.layout.analysis_result2)  // 두 번째 결과 화면 사용
-            }
+            setContentView(R.layout.analysis_result2)  // 두 번째 결과 화면 사용
         }
 
         // 결과 텍스트 표시
