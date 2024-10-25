@@ -1,16 +1,54 @@
 package com.example.fast2
 
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
-import android.os.Looper
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.fast2.api.ApiClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
+import java.io.FileWriter
+import kotlin.collections.ArrayList
+import kotlin.math.sin
 
-class DiagnosisA2Activity : AppCompatActivity() {
+class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
     private lateinit var countdownText: TextView
     private var countDownTimer: CountDownTimer? = null
+
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private var gyroscope: Sensor? = null
+    private var isMeasuring = false
+
+    // 테스트 모드 관련 변수
+    private val isTestMode = true  // 테스트 모드 활성화
+    private var testStartTime: Long = 0
+
+    // 센서 데이터 관련 변수
+    private val sensorReadings = ArrayList<SensorReading>()
+    private var startTime: Long = 0
+
+    data class SensorReading(
+        val samplingTime: Double,
+        val accelerationX: Float,
+        val accelerationY: Float,
+        val accelerationZ: Float,
+        val gyroX: Float,
+        val gyroY: Float,
+        val gyroZ: Float
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,24 +56,222 @@ class DiagnosisA2Activity : AppCompatActivity() {
 
         countdownText = findViewById(R.id.COUNT_text)
 
-        startCountdown()
+        if (!isTestMode) {
+            setupSensors()
+        }
+
+        startCountdownAndMeasurement()
     }
 
-    private fun startCountdown() {
+    private fun setupSensors() {
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+
+        if (accelerometer == null || gyroscope == null) {
+            Toast.makeText(this, "필요한 센서를 찾을 수 없습니다.", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+    }
+
+    private fun startCountdownAndMeasurement() {
+        // 측정 시작
+        startTime = System.nanoTime()
+        testStartTime = System.nanoTime()
+        isMeasuring = true
+        sensorReadings.clear()
+
+        if (!isTestMode) {
+            val samplingPeriodUs = 50000 // 50ms
+            sensorManager.registerListener(this, accelerometer, samplingPeriodUs)
+            sensorManager.registerListener(this, gyroscope, samplingPeriodUs)
+        }
+
+        // 카운트다운 시작
         countDownTimer = object : CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsRemaining = millisUntilFinished / 1000
                 countdownText.text = secondsRemaining.toString()
+
+                if (isTestMode) {
+                    generateTestData()
+                }
             }
 
             override fun onFinish() {
-                startActivity(Intent(this@DiagnosisA2Activity, DiagnosisS1Activity::class.java))
+                countdownText.text = "0"
+                stopMeasurementAndProcessData()
             }
         }.start()
+    }
+
+    private fun generateTestData() {
+        val currentTime = System.nanoTime()
+        val elapsedSeconds = (currentTime - testStartTime) / 1_000_000_000.0
+
+        // 사인파를 사용하여 움직임 시뮬레이션
+        val accelerationX = (sin(elapsedSeconds * 2.0) * 2).toFloat()
+        val accelerationY = (sin(elapsedSeconds * 3.0) * 1.5).toFloat()
+        val accelerationZ = (9.81 + sin(elapsedSeconds) * 0.5).toFloat()
+
+        val gyroX = (sin(elapsedSeconds * 4.0) * 0.5).toFloat()
+        val gyroY = (sin(elapsedSeconds * 3.5) * 0.3).toFloat()
+        val gyroZ = (sin(elapsedSeconds * 2.5) * 0.4).toFloat()
+
+        sensorReadings.add(
+            SensorReading(
+                samplingTime = elapsedSeconds,
+                accelerationX = accelerationX,
+                accelerationY = accelerationY,
+                accelerationZ = accelerationZ,
+                gyroX = gyroX,
+                gyroY = gyroY,
+                gyroZ = gyroZ
+            )
+        )
+
+        android.util.Log.d("DiagnosisA2", "Generated test data point: $elapsedSeconds")
+    }
+
+    private fun stopMeasurementAndProcessData() {
+        isMeasuring = false
+        if (!isTestMode) {
+            sensorManager.unregisterListener(this)
+        }
+
+        lifecycleScope.launch {
+            try {
+                android.util.Log.d("DiagnosisA2", "Creating CSV file with ${sensorReadings.size} readings")
+                val csvFile = createCsvFile()
+                uploadSensorData(csvFile)
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@DiagnosisA2Activity,
+                        "데이터 처리 중 오류가 발생했습니다: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                e.printStackTrace()
+                navigateToNextScreen()
+            }
+        }
+    }
+
+    private fun createCsvFile(): File {
+        val file = File(cacheDir, "sensor_data.csv")
+        FileWriter(file).use { writer ->
+            writer.append("SamplingTime,AccelerationX,AccelerationY,AccelerationZ,GyroX,GyroY,GyroZ\n")
+
+            sensorReadings.forEach { reading ->
+                writer.append(
+                    "${reading.samplingTime},${reading.accelerationX},${reading.accelerationY}," +
+                            "${reading.accelerationZ},${reading.gyroX},${reading.gyroY},${reading.gyroZ}\n"
+                )
+            }
+        }
+
+        android.util.Log.d("DiagnosisA2", "CSV file created: ${file.absolutePath}")
+        android.util.Log.d("DiagnosisA2", "First few lines:\n${file.readLines().take(5).joinToString("\n")}")
+
+        return file
+    }
+
+    private suspend fun uploadSensorData(file: File) {
+        try {
+            android.util.Log.d("DiagnosisA2", "Starting data upload")
+
+            val requestFile = file.asRequestBody("text/csv".toMediaTypeOrNull())
+            val filePart = MultipartBody.Part.createFormData("csv", file.name, requestFile)
+
+            val response = withContext(Dispatchers.IO) {
+                ApiClient.strokeApiService.analyzeArm(filePart)
+            }
+
+            if (response.isSuccessful) {
+                response.body()?.let { result ->
+                    android.util.Log.d("DiagnosisA2", "Upload successful: score=${result.result.score}, stroke=${result.result.stroke}")
+
+                    // 결과 저장
+                    getSharedPreferences("analysis_results", MODE_PRIVATE).edit().apply {
+                        putFloat("arm_score", result.result.score)
+                        putInt("arm_stroke", result.result.stroke)
+                        apply()
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        val message = if (result.result.stroke == 1) {
+                            "이상 징후가 감지되었습니다"
+                        } else {
+                            "정상입니다"
+                        }
+                        Toast.makeText(this@DiagnosisA2Activity, message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                android.util.Log.e("DiagnosisA2", "API Error: ${response.errorBody()?.string()}")
+                throw Exception("API 오류: ${response.errorBody()?.string()}")
+            }
+        } finally {
+            file.delete()
+            withContext(Dispatchers.Main) {
+                navigateToNextScreen()
+            }
+        }
+    }
+
+    private fun navigateToNextScreen() {
+        startActivity(Intent(this, DiagnosisS1Activity::class.java))
+        finish()
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        if (!isMeasuring) return
+
+        val currentTime = System.nanoTime()
+        val samplingTime = (currentTime - startTime) / 1_000_000_000.0
+
+        when (event.sensor.type) {
+            Sensor.TYPE_ACCELEROMETER -> {
+                sensorReadings.add(
+                    SensorReading(
+                        samplingTime = samplingTime,
+                        accelerationX = event.values[0],
+                        accelerationY = event.values[1],
+                        accelerationZ = event.values[2],
+                        gyroX = 0f,
+                        gyroY = 0f,
+                        gyroZ = 0f
+                    )
+                )
+                android.util.Log.d("DiagnosisA2", "Accelerometer data recorded at $samplingTime")
+            }
+            Sensor.TYPE_GYROSCOPE -> {
+                if (sensorReadings.isNotEmpty()) {
+                    val lastReading = sensorReadings.last()
+                    if (lastReading.gyroX == 0f && lastReading.gyroY == 0f && lastReading.gyroZ == 0f) {
+                        sensorReadings[sensorReadings.lastIndex] = lastReading.copy(
+                            gyroX = event.values[0],
+                            gyroY = event.values[1],
+                            gyroZ = event.values[2]
+                        )
+                        android.util.Log.d("DiagnosisA2", "Gyroscope data added to reading at $samplingTime")
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // Not used
     }
 
     override fun onDestroy() {
         super.onDestroy()
         countDownTimer?.cancel()
+        if (!isTestMode) {
+            sensorManager.unregisterListener(this)
+        }
     }
 }
