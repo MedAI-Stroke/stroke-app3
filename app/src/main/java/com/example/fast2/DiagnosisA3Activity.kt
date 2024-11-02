@@ -24,7 +24,7 @@ import java.io.FileWriter
 import kotlin.collections.ArrayList
 import kotlin.math.sin
 
-class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
+class DiagnosisA3Activity : AppCompatActivity(), SensorEventListener {
     private lateinit var countdownText: TextView
     private var countDownTimer: CountDownTimer? = null
 
@@ -51,12 +51,12 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.diagnosis_a2)
+        setContentView(R.layout.diagnosis_a3)
 
         countdownText = findViewById(R.id.COUNT_text)
 
         // a_left.mp3 파일 재생
-        val mediaPlayer = MediaPlayer.create(this, R.raw.a_left)
+        val mediaPlayer = MediaPlayer.create(this, R.raw.a_right)
         mediaPlayer.start()
 
         mediaPlayer.setOnCompletionListener {
@@ -137,7 +137,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
             )
         )
 
-        android.util.Log.d("DiagnosisA2", "Generated test data point: $elapsedSeconds")
+        android.util.Log.d("DiagnosisA3", "Generated test data point: $elapsedSeconds")
     }
 
     private fun stopMeasurementAndProcessData() {
@@ -148,13 +148,13 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
 
         lifecycleScope.launch {
             try {
-                android.util.Log.d("DiagnosisA2", "Creating CSV file with ${sensorReadings.size} readings")
+                android.util.Log.d("DiagnosisA3", "Creating CSV file with ${sensorReadings.size} readings")
                 val csvFile = createCsvFile()
                 uploadSensorData(csvFile)
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
-                        this@DiagnosisA2Activity,
+                        this@DiagnosisA3Activity,
                         "데이터 처리 중 오류가 발생했습니다: ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -178,15 +178,15 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
             }
         }
 
-        android.util.Log.d("DiagnosisA2", "CSV file created: ${file.absolutePath}")
-        android.util.Log.d("DiagnosisA2", "First few lines:\n${file.readLines().take(5).joinToString("\n")}")
+        android.util.Log.d("DiagnosisA3", "CSV file created: ${file.absolutePath}")
+        android.util.Log.d("Diagnosis32", "First few lines:\n${file.readLines().take(5).joinToString("\n")}")
 
         return file
     }
 
     private suspend fun uploadSensorData(file: File) {
         try {
-            android.util.Log.d("DiagnosisA2", "Starting data upload")
+            android.util.Log.d("DiagnosisA3", "Starting data upload")
 
             val requestFile = file.asRequestBody("text/csv".toMediaTypeOrNull())
             val filePart = MultipartBody.Part.createFormData("csv", file.name, requestFile)
@@ -197,7 +197,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
 
             if (response.isSuccessful) {
                 response.body()?.let { result ->
-                    android.util.Log.d("DiagnosisA2", "Upload successful: score=${result.result.score}, stroke=${result.result.stroke}")
+                    android.util.Log.d("DiagnosisA3", "Upload successful: score=${result.result.score}, stroke=${result.result.stroke}")
 
                     // 결과 저장
                     getSharedPreferences("analysis_results", MODE_PRIVATE).edit().apply {
@@ -208,7 +208,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
 
                 }
             } else {
-                android.util.Log.e("DiagnosisA2", "API Error: ${response.errorBody()?.string()}")
+                android.util.Log.e("DiagnosisA3", "API Error: ${response.errorBody()?.string()}")
                 throw Exception("API 오류: ${response.errorBody()?.string()}")
             }
         } finally {
@@ -243,7 +243,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
                         gyroZ = 0f
                     )
                 )
-                android.util.Log.d("DiagnosisA2", "Accelerometer data recorded at $samplingTime")
+                android.util.Log.d("DiagnosisA3", "Accelerometer data recorded at $samplingTime")
             }
             Sensor.TYPE_GYROSCOPE -> {
                 if (sensorReadings.isNotEmpty()) {
@@ -254,7 +254,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
                             gyroY = event.values[1],
                             gyroZ = event.values[2]
                         )
-                        android.util.Log.d("DiagnosisA2", "Gyroscope data added to reading at $samplingTime")
+                        android.util.Log.d("DiagnosisA3", "Gyroscope data added to reading at $samplingTime")
                     }
                 }
             }
