@@ -3,6 +3,7 @@ package com.example.fast2
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
@@ -28,6 +29,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var mediaPlayer: MediaPlayer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,11 +38,17 @@ class MainActivity : AppCompatActivity() {
         // 권한 체크 및 요청
         checkAndRequestPermissions()
 
+        // MediaPlayer 초기화 및 mp3 파일 재생 준비
+        mediaPlayer = MediaPlayer.create(this, R.raw.start)
+        mediaPlayer.start() // 액티비티 시작 시 음성 안내 자동 재생
+
         // ANA 버튼 설정
         val anaButtonImage: ImageView = findViewById(R.id.ANA_button_image)
         anaButtonImage.setOnClickListener {
+            // 사용자가 버튼을 클릭하면 FActivity로 전환
             val intent = Intent(this, FActivity::class.java)
             startActivity(intent)
+            // 음성이 재생 중이라도 버튼 클릭 시에는 화면 전환
         }
     }
 
@@ -50,6 +59,13 @@ class MainActivity : AppCompatActivity() {
 
         if (permissionsToRequest.isNotEmpty()) {
             permissionLauncher.launch(permissionsToRequest)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::mediaPlayer.isInitialized) {
+            mediaPlayer.release() // MediaPlayer 리소스 해제
         }
     }
 }

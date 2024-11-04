@@ -5,6 +5,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.TextView
@@ -32,11 +33,9 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
     private var gyroscope: Sensor? = null
     private var isMeasuring = false
 
-    // 테스트 모드 관련 변수
     private val isTestMode = false  // 테스트 모드 비활성화
     private var testStartTime: Long = 0
 
-    // 센서 데이터 관련 변수
     private val sensorReadings = ArrayList<SensorReading>()
     private var startTime: Long = 0
 
@@ -56,11 +55,18 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
 
         countdownText = findViewById(R.id.COUNT_text)
 
+        // a_left.mp3 파일 재생
+        val mediaPlayer = MediaPlayer.create(this, R.raw.a_left)
+        mediaPlayer.start()
+
+        mediaPlayer.setOnCompletionListener {
+            mediaPlayer.release()
+            startCountdownAndMeasurement() // 오디오 재생 후 측정 시작
+        }
+
         if (!isTestMode) {
             setupSensors()
         }
-
-        startCountdownAndMeasurement()
     }
 
     private fun setupSensors() {
@@ -255,15 +261,4 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Not used
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        countDownTimer?.cancel()
-        if (!isTestMode) {
-            sensorManager.unregisterListener(this)
-        }
-    }
-}
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
+import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
@@ -29,6 +30,7 @@ class DiagnosisS2Activity : AppCompatActivity() {
     private var isRecording = false
     private lateinit var outputFile: File
     private val isTestMode = false
+    private lateinit var mediaPlayer: MediaPlayer
 
     companion object {
         private const val SAMPLE_RATE = 16000
@@ -41,11 +43,10 @@ class DiagnosisS2Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.diagnosis_s2)
 
-        if (isTestMode) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                sendTestAudioData()
-            }, 3000)
-        } else {
+        // MediaPlayer 초기화 및 mp3 파일 설정
+        mediaPlayer = MediaPlayer.create(this, R.raw.s)
+        mediaPlayer.setOnCompletionListener {
+            // s.mp3 파일 재생이 완료되면 녹음 시작
             if (checkPermission()) {
                 startWavRecording()
                 // 5초 후 녹음 중지
@@ -55,6 +56,9 @@ class DiagnosisS2Activity : AppCompatActivity() {
                 }, 5000)
             }
         }
+
+        // mp3 파일 재생
+        mediaPlayer.start()
     }
 
     private fun checkPermission(): Boolean {
@@ -109,7 +113,6 @@ class DiagnosisS2Activity : AppCompatActivity() {
         val tempDataFile = File(cacheDir, "temp_audio_data.raw")
         var totalDataSize = 0
 
-        // 먼저 raw 데이터를 임시 파일에 저장
         FileOutputStream(tempDataFile).use { fos ->
             val buffer = ByteArray(BUFFER_SIZE)
             audioRecord?.startRecording()
@@ -123,12 +126,9 @@ class DiagnosisS2Activity : AppCompatActivity() {
             }
         }
 
-        // WAV 파일 생성
         FileOutputStream(outputFile).use { fos ->
-            // WAV 헤더 작성
             writeWavHeader(fos, totalDataSize)
 
-            // raw 데이터 복사
             FileInputStream(tempDataFile).use { fis ->
                 val buffer = ByteArray(BUFFER_SIZE)
                 var read: Int
@@ -138,29 +138,25 @@ class DiagnosisS2Activity : AppCompatActivity() {
             }
         }
 
-        // 임시 파일 삭제
         tempDataFile.delete()
     }
 
     private fun writeWavHeader(outputStream: FileOutputStream, totalDataSize: Int) {
         val buffer = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN)
 
-        // RIFF 헤더
         buffer.put("RIFF".toByteArray())
         buffer.putInt(36 + totalDataSize)
         buffer.put("WAVE".toByteArray())
 
-        // fmt 청크
         buffer.put("fmt ".toByteArray())
-        buffer.putInt(16) // 서브청크1크기
-        buffer.putShort(1.toShort()) // PCM = 1
-        buffer.putShort(1.toShort()) // 모노 = 1
-        buffer.putInt(SAMPLE_RATE) // 샘플레이트
-        buffer.putInt(SAMPLE_RATE * 2) // 바이트레이트
-        buffer.putShort(2.toShort()) // 블록얼라인
-        buffer.putShort(16.toShort()) // 비트퍼샘플
+        buffer.putInt(16)
+        buffer.putShort(1.toShort())
+        buffer.putShort(1.toShort())
+        buffer.putInt(SAMPLE_RATE)
+        buffer.putInt(SAMPLE_RATE * 2)
+        buffer.putShort(2.toShort())
+        buffer.putShort(16.toShort())
 
-        // 데이터 청크
         buffer.put("data".toByteArray())
         buffer.putInt(totalDataSize)
 
@@ -174,23 +170,6 @@ class DiagnosisS2Activity : AppCompatActivity() {
             release()
         }
         audioRecord = null
-    }
-
-    private fun sendTestAudioData() {
-        try {
-            val inputStream = assets.open("test_audio.wav")
-            val testFile = File(cacheDir, "test_audio.wav")
-
-            testFile.outputStream().use { output ->
-                inputStream.copyTo(output)
-            }
-
-            uploadAudioFile(testFile)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "테스트 파일 로드 실패: ${e.message}", Toast.LENGTH_SHORT).show()
-            navigateToNextScreen()
-        }
     }
 
     private fun uploadAudioFile(file: File = outputFile) {
@@ -238,6 +217,9 @@ class DiagnosisS2Activity : AppCompatActivity() {
         stopRecording()
         if (::outputFile.isInitialized && outputFile.exists()) {
             outputFile.delete()
+        }
+        if (::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
         }
     }
 }
