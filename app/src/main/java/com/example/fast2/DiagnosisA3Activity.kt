@@ -148,7 +148,10 @@ class DiagnosisA3Activity : AppCompatActivity(), SensorEventListener {
 
         lifecycleScope.launch {
             try {
-                android.util.Log.d("DiagnosisA3", "Creating CSV file with ${sensorReadings.size} readings")
+                android.util.Log.d(
+                    "DiagnosisA3",
+                    "Creating CSV file with ${sensorReadings.size} readings"
+                )
                 val csvFile = createCsvFile()
                 uploadSensorData(csvFile)
             } catch (e: Exception) {
@@ -179,7 +182,10 @@ class DiagnosisA3Activity : AppCompatActivity(), SensorEventListener {
         }
 
         android.util.Log.d("DiagnosisA3", "CSV file created: ${file.absolutePath}")
-        android.util.Log.d("Diagnosis32", "First few lines:\n${file.readLines().take(5).joinToString("\n")}")
+        android.util.Log.d(
+            "Diagnosis32",
+            "First few lines:\n${file.readLines().take(5).joinToString("\n")}"
+        )
 
         return file
     }
@@ -197,7 +203,10 @@ class DiagnosisA3Activity : AppCompatActivity(), SensorEventListener {
 
             if (response.isSuccessful) {
                 response.body()?.let { result ->
-                    android.util.Log.d("DiagnosisA3", "Upload successful: score=${result.result.score}, stroke=${result.result.stroke}")
+                    android.util.Log.d(
+                        "DiagnosisA3",
+                        "Upload successful: score=${result.result.score}, stroke=${result.result.stroke}"
+                    )
 
                     // 결과 저장
                     getSharedPreferences("analysis_results", MODE_PRIVATE).edit().apply {
@@ -245,6 +254,7 @@ class DiagnosisA3Activity : AppCompatActivity(), SensorEventListener {
                 )
                 android.util.Log.d("DiagnosisA3", "Accelerometer data recorded at $samplingTime")
             }
+
             Sensor.TYPE_GYROSCOPE -> {
                 if (sensorReadings.isNotEmpty()) {
                     val lastReading = sensorReadings.last()
@@ -254,11 +264,17 @@ class DiagnosisA3Activity : AppCompatActivity(), SensorEventListener {
                             gyroY = event.values[1],
                             gyroZ = event.values[2]
                         )
-                        android.util.Log.d("DiagnosisA3", "Gyroscope data added to reading at $samplingTime")
+                        android.util.Log.d(
+                            "DiagnosisA3",
+                            "Gyroscope data added to reading at $samplingTime"
+                        )
                     }
                 }
             }
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // 구현이 필요 없다면 비워두어도 됩니다
+    }
+}
