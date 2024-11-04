@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     tools:context=".MainActivity">
 
     <!-- FAST 로고 이미지 -->
@@ -22,7 +21,7 @@
 
     <ImageView
         android:id="@+id/R2_image"
-        android:layout_width="700dp"
+        android:layout_width="350dp"
         android:layout_height="500dp"
         android:contentDescription="R2 Image"
         android:scaleType="fitCenter"
@@ -32,29 +31,12 @@
         android:layout_marginTop="10dp"
         app:layout_constraintTop_toBottomOf="@id/logo_image" />
 
-    <TextView
-        android:id="@+id/date_text_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="진단 결과"
-        android:textColor="#4F9E9E"
-        android:textSize="23sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/logo_image"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="110dp"/>
-
-
-
     <!-- 하단바 -->
     <View
         android:id="@+id/bottom_bar"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="#E0E0E0"
+        android:background="@drawable/top_border"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

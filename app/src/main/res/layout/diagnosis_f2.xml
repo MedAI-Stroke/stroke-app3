@@ -5,20 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     tools:context=".MainActivity">
-
-    <!-- FAST 로고 이미지 -->
-    <ImageView
-        android:id="@+id/logo_image"
-        android:layout_width="187dp"
-        android:layout_height="86dp"
-        android:src="@drawable/logo"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
-        android:contentDescription="FAST Logo" />
 
     <!-- 상태바 -->
     <ImageView
@@ -26,11 +13,10 @@
         android:layout_width="420dp"
         android:layout_height="80dp"
         android:src="@drawable/prof"
-        android:scaleType="fitCenter"
-        app:layout_constraintTop_toBottomOf="@id/logo_image"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="-20dp"
+        android:layout_marginTop="20dp"
         android:contentDescription="PRO F Image" />
 
     <!-- 카메라 프리뷰를 위한 프레임 레이아웃 -->
@@ -65,16 +51,15 @@
     <!-- 촬영 버튼 -->
     <ImageButton
         android:id="@+id/capture_button"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:src="@drawable/ic_camera"
-        android:background="@drawable/round_button"
+        android:layout_width="240dp"
+        android:layout_height="120dp"
+        android:background="@drawable/f3"
         android:scaleType="fitCenter"
         android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="40dp"
         android:contentDescription="Capture Button" />
 
     <ProgressBar
@@ -92,7 +77,7 @@
         android:id="@+id/bottom_bar"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="#E0E0E0"
+        android:background="@drawable/top_border"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

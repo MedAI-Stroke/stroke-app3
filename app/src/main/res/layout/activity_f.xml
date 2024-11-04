@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     tools:context=".MainActivity">
 
     <!-- ViewPager2: 전체 화면을 채우도록 설정 -->
@@ -40,7 +39,7 @@
         app:layout_constraintTop_toBottomOf="@id/logo_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="15dp"
         android:contentDescription="F Button Image" />
 
     <!-- A 버튼 이미지 -->
@@ -53,7 +52,7 @@
         app:layout_constraintTop_toBottomOf="@id/F_button_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="-20dp"
+        android:layout_marginTop="-15dp"
         android:contentDescription="A Button Image" />
 
     <!-- S 버튼 이미지 -->
@@ -66,7 +65,7 @@
         app:layout_constraintTop_toBottomOf="@id/F_button_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="130dp"
         android:contentDescription="S Button Image" />
 
     <!-- 하단바 -->
@@ -74,7 +73,7 @@
         android:id="@+id/bottom_bar"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="#E0E0E0"
+        android:background="@drawable/top_border"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
