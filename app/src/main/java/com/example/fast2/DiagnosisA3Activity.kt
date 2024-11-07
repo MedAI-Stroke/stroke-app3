@@ -210,8 +210,8 @@ class DiagnosisA3Activity : AppCompatActivity(), SensorEventListener {
 
                     // 결과 저장
                     getSharedPreferences("analysis_results", MODE_PRIVATE).edit().apply {
-                        putFloat("arm_score", result.result.score)
-                        putInt("arm_stroke", result.result.stroke)
+                        putFloat("right_arm_score", result.result.score)
+                        putInt("right_arm_stroke", result.result.stroke)
                         apply()
                     }
 

@@ -15,7 +15,8 @@ class AnalysisResultActivity : AppCompatActivity() {
 
         // 각 검사 결과와 점수 가져오기
         val faceStroke = prefs.getInt("face_stroke", 0)
-        val armStroke = prefs.getInt("arm_stroke", 0)
+        val leftArmStroke = prefs.getInt("left_arm_stroke", 0)
+        val rightArmStroke = prefs.getInt("right_arm_stroke", 0)
         val speechStroke = prefs.getInt("speech_stroke", 0)
 
 
@@ -26,7 +27,7 @@ class AnalysisResultActivity : AppCompatActivity() {
             append("진단 결과\n\n")
 
             // 이상이 있는 경우 경고 메시지 추가
-            if (faceStroke == 1 || armStroke == 1 || speechStroke == 1) {
+            if (faceStroke == 1 || leftArmStroke == 1 || rightArmStroke == 1 ||speechStroke == 1) {
                 setContentView(R.layout.analysis_result1)  // 첫 번째 결과 화면 사용
             } else {
                 setContentView(R.layout.analysis_result2)  // 두 번째 결과 화면 사용

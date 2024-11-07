@@ -45,10 +45,14 @@ class MainActivity : AppCompatActivity() {
         // ANA 버튼 설정
         val anaButtonImage: ImageView = findViewById(R.id.ANA_button_image)
         anaButtonImage.setOnClickListener {
-            // 사용자가 버튼을 클릭하면 FActivity로 전환
+            // 음성 재생 중지
+            if (mediaPlayer.isPlaying) {
+                mediaPlayer.stop()
+            }
+
+            // FActivity로 전환
             val intent = Intent(this, FActivity::class.java)
             startActivity(intent)
-            // 음성이 재생 중이라도 버튼 클릭 시에는 화면 전환
         }
     }
 
