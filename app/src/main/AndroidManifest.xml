@@ -39,6 +39,7 @@
         <activity android:name=".DiagnosisF2Activity"/>
         <activity android:name=".DiagnosisA1Activity"/>
         <activity android:name=".DiagnosisA2Activity"/>
+        <activity android:name=".DiagnosisA3Activity"/>
         <activity android:name=".DiagnosisS1Activity"/>
         <activity android:name=".DiagnosisS2Activity"/>
         <activity android:name=".AnalysisMainActivity"/>

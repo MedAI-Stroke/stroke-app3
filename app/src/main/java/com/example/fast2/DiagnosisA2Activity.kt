@@ -210,8 +210,8 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
 
                     // 결과 저장
                     getSharedPreferences("analysis_results", MODE_PRIVATE).edit().apply {
-                        putFloat("arm_score", result.result.score)
-                        putInt("arm_stroke", result.result.stroke)
+                        putFloat("left_arm_score", result.result.score)
+                        putInt("left_arm_stroke", result.result.stroke)
                         apply()
                     }
 
@@ -229,7 +229,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun navigateToNextScreen() {
-        startActivity(Intent(this, DiagnosisS1Activity::class.java))
+        startActivity(Intent(this, DiagnosisA3Activity::class.java))
         finish()
     }
 
