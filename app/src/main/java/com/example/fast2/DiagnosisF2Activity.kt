@@ -34,7 +34,7 @@ class DiagnosisF2Activity : AppCompatActivity(), SurfaceHolder.Callback {
     private var isCameraCaptured = false
     private var pictureFile: File? = null
     private lateinit var loadingProgress: ProgressBar
-    private var isTestMode = false  // 테스트 모드 플래그
+    private var isTestMode = true  // 테스트 모드 플래그
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

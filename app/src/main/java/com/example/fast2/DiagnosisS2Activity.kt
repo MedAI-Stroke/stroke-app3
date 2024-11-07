@@ -29,7 +29,7 @@ class DiagnosisS2Activity : AppCompatActivity() {
     private var audioRecord: AudioRecord? = null
     private var isRecording = false
     private lateinit var outputFile: File
-    private val isTestMode = false
+    private val isTestMode = true // 테스트 모드
     private lateinit var mediaPlayer: MediaPlayer
 
     companion object {
