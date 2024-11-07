@@ -33,7 +33,7 @@ class DiagnosisA2Activity : AppCompatActivity(), SensorEventListener {
     private var gyroscope: Sensor? = null
     private var isMeasuring = false
 
-    private val isTestMode = false  // 테스트 모드 활성화
+    private val isTestMode = true  // 테스트 모드 활성화
     private var testStartTime: Long = 0
 
     private val sensorReadings = ArrayList<SensorReading>()

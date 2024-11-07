@@ -190,6 +190,7 @@ class DiagnosisS2Activity : AppCompatActivity() {
                             apply()
                         }
                     }
+
                 } else {
                     throw Exception("API 오류: ${response.errorBody()?.string()}")
                 }
