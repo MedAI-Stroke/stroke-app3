@@ -44,6 +44,7 @@
         <activity android:name=".DiagnosisS2Activity"/>
         <activity android:name=".AnalysisMainActivity"/>
         <activity android:name=".AnalysisResultActivity"/>
+        <activity android:name=".DebugActivity"/>
     </application>
 
 </manifest>

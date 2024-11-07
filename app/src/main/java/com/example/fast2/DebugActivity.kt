@@ -29,8 +29,8 @@ class DebugActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("analysis_results", MODE_PRIVATE)
 
         // Face 결과 업데이트
-        val faceScore = prefs.getFloat("face_score", -1f)
-        val faceStroke = prefs.getInt("face_stroke", -1)
+        val faceScore = prefs.getFloat("face_score", 0f)
+        val faceStroke = prefs.getInt("face_stroke", 0)
         faceResultText.text = """
             Score: $faceScore
             Stroke: $faceStroke
@@ -38,10 +38,10 @@ class DebugActivity : AppCompatActivity() {
         """.trimIndent()
 
         // Arm 결과 업데이트
-        val leftArmScore = prefs.getFloat("left_arm_score", -1f)
-        val leftArmStroke = prefs.getInt("left_arm_stroke", -1)
-        val rightArmScore = prefs.getFloat("right_arm_score", -1f)
-        val rightArmStroke = prefs.getInt("right_arm_stroke", -1)
+        val leftArmScore = prefs.getFloat("left_arm_score", 0f)
+        val leftArmStroke = prefs.getInt("left_arm_stroke", 0)
+        val rightArmScore = prefs.getFloat("right_arm_score", 0f)
+        val rightArmStroke = prefs.getInt("right_arm_stroke", 0)
         armResultText.text = """
             Left Arm Score: $leftArmScore
             Left Arm Stroke: $leftArmStroke
@@ -51,8 +51,8 @@ class DebugActivity : AppCompatActivity() {
         """.trimIndent()
 
         // Speech 결과 업데이트
-        val speechScore = prefs.getFloat("speech_score", -1f)
-        val speechStroke = prefs.getInt("speech_stroke", -1)
+        val speechScore = prefs.getFloat("speech_score", 0f)
+        val speechStroke = prefs.getInt("speech_stroke", 0)
         speechResultText.text = """
             Score: $speechScore
             Stroke: $speechStroke
